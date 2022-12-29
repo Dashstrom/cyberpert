@@ -3,7 +3,7 @@
 ## Install
 
 ```sh
-pip install git+https://github.com/Dashstrom/cyberpert
+pip install git+https://github.com/Dashstrom/cyberpert.git
 cyberpert
 ```
 
@@ -12,7 +12,7 @@ cyberpert
 For setup developpement :
 
 ```sh
-git clone https://github.com/Dashstrom/cyberpert
+git clone https://github.com/Dashstrom/cyberpert.git
 pip install -r requirements-dev.txt -r requirements.txt
 python3 -m cyberpert
 ```
