@@ -1,0 +1,8 @@
+include cyberpert/*.py
+include cyberpert/py.typed
+include cyberpert/data/rules.json.zip 
+include requirements.txt
+include requirements-dev.txt
+include .gitignore
+include pyproject.toml
+include README.md

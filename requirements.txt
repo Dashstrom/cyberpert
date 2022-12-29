@@ -1,0 +1,7 @@
+tqdm
+lxml
+requests
+orjson
+google-cloud-bigquery
+packaging
+typing_extensions

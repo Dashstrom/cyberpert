@@ -1,0 +1,8 @@
+-r requirements.txt
+flake8
+pylint
+mypy
+isort
+black
+types-requests
+types-tqdm
