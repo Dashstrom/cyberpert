@@ -4,12 +4,17 @@ from .engine import Engine
 
 def cli() -> None:
     engine = Engine(rules=get_rules())
+    print("Begin first :\n")
     for rule in engine.matching({"autobahn": "20.12.3"}):
         print(rule)
-    for rule in engine.matching({"cryptography": "3.0"}):
+    print("\nBegin second :\n")
+    for rule in engine.matching({"pycparser": "2.10"}):
         print(rule)
+    print("\nBegin exploration...\n")
     path = engine.explore({"autobahn": "20.12.3"}, {"$vuln": True})
-    print(path)
+    for x in path:
+        print(x, "\n")
+    #print(path)
 
 
 if __name__ == "__main__":

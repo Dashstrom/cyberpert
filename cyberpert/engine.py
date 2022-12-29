@@ -1,4 +1,5 @@
 import operator
+import re
 from typing import Any, Callable, Dict, Generator, List, Optional
 
 from .utils import Facts, Rule, ver
@@ -67,7 +68,7 @@ def match_rule(condition: Any, facts: Facts) -> bool:
 class Engine:
     def __init__(self, rules: Any) -> None:
         self.rules = rules
-
+        self.path = []
     def _matching_packages(self, facts: Facts) -> Generator[Rule, None, None]:
         """Specific matcher for python packages."""
         for fact, value in facts.items():
@@ -99,6 +100,17 @@ class Engine:
         yield from self._matching(facts)
         yield from self._matching_packages(facts)
 
-    def explore(self, facts: Facts, but: Facts) -> List[str]:
+    def explore(self, facts: Facts, but: Facts, chemin: List[str]=[]) -> List[str]:
         """Start to facts and return a path to but."""
-        return []
+        for rule in self.matching(facts):
+            if not rule[1]:
+                continue
+            if(list(but.values())[0] in rule[1].values() and list(but.keys())[0] in rule[1].keys()):
+                way = chemin.copy()
+                way.append(rule)
+                self.path.append(way)
+            else:
+                new_chemin = chemin.copy()  # copy the list here
+                new_chemin.append(rule[0])
+                self.explore(rule[1], but, new_chemin)
+        return self.path
