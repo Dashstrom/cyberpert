@@ -7,7 +7,7 @@ build-backend = "setuptools.build_meta"
 
 [tool.isort]
 src_paths = ["cyberpert"]
-skip = [".git", ".mypy_cache", ".tox"]
+skip = ["venv", ".git", ".mypy_cache", ".tox"]
 profile = "black"
 multi_line_output = 3
 include_trailing_comma = true
@@ -22,7 +22,7 @@ target-version = ['py36']
 
 [tool.mypy]
 python_version = 3.6
-exclude = ["venv", ".git", ".mypy_cache"]
+exclude = ["venv", ".git", ".mypy_cache", ".tox"]
 
 
 # Disallow dynamic typing
