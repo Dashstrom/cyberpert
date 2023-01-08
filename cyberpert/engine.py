@@ -94,7 +94,7 @@ class Engine:
                             break
                     else:
                         yield (
-                            [fact, "==", value],
+                            (fact, "==", value),
                             {name: version},
                         )
 
