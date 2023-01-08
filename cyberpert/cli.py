@@ -60,6 +60,7 @@ def recursive_join(obj: Any) -> str:
 
 
 def app() -> None:
+    error = 0
     requirements = sys.argv[1:]
     if requirements:
         engine = Engine(rules=get_rules())
@@ -88,8 +89,10 @@ def app() -> None:
                         f"\r{Fore.RED}{req}{Fore.RESET}  "
                         f"{Fore.LIGHTBLACK_EX}# {pretty_path}{Fore.RESET}"
                     )
+                    error = 1
                     break
                 except StopIteration:
                     pass
             else:
                 print(f"\r{Fore.GREEN}{req}{Fore.RESET}")
+    sys.exit(error)
