@@ -28,7 +28,7 @@ from tqdm import tqdm
 from typing_extensions import Literal, ParamSpec, Protocol
 
 Facts = Dict[str, Union[str, bool, float]]
-Condition = List[Any]
+Condition = Tuple[Any, ...]
 Rule = Tuple[Condition, Facts]
 R = TypeVar("R")
 P = ParamSpec("P")
@@ -287,17 +287,17 @@ def ranges_versions(
                 if ranges:
                     ranges.append("or")
                 ranges.append(
-                    [
-                        [name, ">=~", bottom],
+                    (
+                        (name, ">=~", bottom),
                         "and",
-                        [name, "<~", package_version],
-                    ]
+                        (name, "<~", package_version),
+                    )
                 )
                 bottom = None
     if bottom:
         if ranges:
             ranges.append("or")
-        ranges.append([name, ">=~", bottom])
+        ranges.append((name, ">=~", bottom))
     if len(ranges) == 1:
         ranges = ranges[0]
-    return ranges
+    return tuple(ranges)
