@@ -6,3 +6,4 @@ isort
 black
 types-requests
 types-tqdm
+types-colorama

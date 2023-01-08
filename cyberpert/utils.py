@@ -40,6 +40,11 @@ CACHE_PATH = DATA_PATH / "cache"
 CACHE_DOWNLOAD_PATH = CACHE_PATH / "download"
 CACHE_FUNCTION_PATH = CACHE_PATH / "function"
 RULES_PATH = DATA_PATH / "rules"
+try:
+    os.get_terminal_size()
+    PIPED = False
+except OSError:
+    PIPED = True
 
 
 def ftqdm(
@@ -61,6 +66,7 @@ def ftqdm(
         unit_scale=unit_scale,
         smoothing=smoothing,
         position=position,
+        disable=PIPED,
     )
 
 

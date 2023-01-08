@@ -1,6 +1,14 @@
 import operator
-import re
-from typing import Any, Callable, Dict, Generator, List, Optional
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Generator,
+    Iterable,
+    List,
+    Optional,
+    Tuple,
+)
 
 from .utils import Facts, Rule, ver
 
@@ -68,7 +76,8 @@ def match_rule(condition: Any, facts: Facts) -> bool:
 class Engine:
     def __init__(self, rules: Any) -> None:
         self.rules = rules
-        self.path = []
+        self._matching_cache: Dict[Any, List[Any]] = {}
+
     def _matching_packages(self, facts: Facts) -> Generator[Rule, None, None]:
         """Specific matcher for python packages."""
         for fact, value in facts.items():
@@ -89,6 +98,21 @@ class Engine:
                             {name: version},
                         )
 
+    def expend(
+        self, requirement: Tuple[str, List[Tuple[str, str]]]
+    ) -> Generator[str, None, None]:
+        """Return all version matching constraints."""
+        requirements = self.rules["packages"].get(requirement[0].lower(), {})
+        for version in requirements.keys():
+            cmp_version = ver(version)
+            for (op, op_version) in requirement[1]:
+                cmp_op_version = ver(op_version)
+                comparator = OPERATORS.get(op, never)
+                if not comparator(cmp_version, cmp_op_version):
+                    break
+            else:
+                yield version
+
     def _matching(self, facts: Facts) -> Generator[Rule, None, None]:
         """Hight logic matcher."""
         for (condition, new_facts) in self.rules["rules"]:
@@ -100,17 +124,22 @@ class Engine:
         yield from self._matching(facts)
         yield from self._matching_packages(facts)
 
-    def explore(self, facts: Facts, but: Facts, chemin: List[str]=[]) -> List[str]:
+    def explore(self, facts: Facts, but: Facts) -> Iterable[Any]:
         """Start to facts and return a path to but."""
-        for rule in self.matching(facts):
-            if not rule[1]:
-                continue
-            if(list(but.values())[0] in rule[1].values() and list(but.keys())[0] in rule[1].keys()):
-                way = chemin.copy()
-                way.append(rule)
-                self.path.append(way)
+        key = (tuple(facts.items()), tuple(but.items()))
+        try:
+            yield from self._matching_cache[key]
+        except KeyError:
+            paths: List[Any] = []
+            if all(
+                facts.get(key, None) == value for key, value in but.items()
+            ):
+                paths.append((facts,))
+                yield (facts,)
             else:
-                new_chemin = chemin.copy()  # copy the list here
-                new_chemin.append(rule[0])
-                self.explore(rule[1], but, new_chemin)
-        return self.path
+                for rule in self.matching(facts):
+                    for subpath in self.explore(rule[1], but):
+                        path = (rule[0], *subpath)
+                        paths.append(path)
+                        yield path
+            self._matching_cache[key] = paths

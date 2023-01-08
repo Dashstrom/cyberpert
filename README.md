@@ -4,7 +4,7 @@
 
 ```sh
 pip install git+https://github.com/Dashstrom/cyberpert.git
-cyberpert
+cyberpert -r requirements.txt
 ```
 
 ## Developement

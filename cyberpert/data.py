@@ -130,6 +130,12 @@ def fetch_cves_per_packages() -> List[List[Union[Condition, Facts]]]:
     ]
 
 
+def tuplize(array: Any) -> Tuple[Any, ...]:
+    if isinstance(array, list):
+        return tuple(tuplize(obj) for obj in array)
+    return array  # type: ignore
+
+
 def get_rules() -> Any:
     """Get or download all rules."""
     if RULES_PATH.exists():
@@ -142,4 +148,5 @@ def get_rules() -> Any:
         }
         with TqdmIO("rules") as io:
             io.write_jsonzip(RULES_PATH, data, zipfile.ZIP_LZMA)
+    data["rules"] = tuplize(data["rules"])
     return data
