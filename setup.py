@@ -41,7 +41,7 @@ setup(
     },
     entry_points={
         "console_scripts": [
-            "cyberpert=cyberpert.__main__:cli",
+            "cyberpert=cyberpert.cli:app",
         ]
     },
 )

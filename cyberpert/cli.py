@@ -4,8 +4,8 @@ from typing import Any, Dict, List, Tuple
 
 from colorama import Fore, init
 
-from cyberpert.pypi import parse_requirements
-from cyberpert.utils import PIPED
+from .pypi import parse_requirements
+from .utils import PIPED
 
 from .data import get_rules
 from .engine import Engine

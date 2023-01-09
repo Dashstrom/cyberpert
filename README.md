@@ -3,8 +3,9 @@
 ## Install
 
 ```sh
-pip install git+https://github.com/Dashstrom/cyberpert.git
-cyberpert -r requirements.txt
+git clone git+https://github.com/Dashstrom/cyberpert.git
+pip install .
+cyberpert -r requirements-dev.txt
 ```
 
 ## Developement
