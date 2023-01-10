@@ -64,10 +64,10 @@ def app() -> None:
     requirements = sys.argv[1:]
     if requirements:
         engine = Engine(rules=get_rules())
-        for req, (line, values) in iter_requirements(requirements).items():
+        for req, (line, constraint) in iter_requirements(requirements).items():
             if not PIPED:
                 print(f"{Fore.YELLOW}{line}{Fore.RESET}", end="", flush=True)
-            for version in engine.expend((req, values)):
+            for version in engine.expend((req, constraint)):
                 try:
                     path = next(
                         iter(engine.explore({req: version}, {"$vuln": True}))
