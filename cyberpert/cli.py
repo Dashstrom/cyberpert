@@ -15,9 +15,9 @@ init()
 
 def iter_requirements(
     requirements: List[str],
-) -> Dict[str, List[Tuple[str, str]]]:
+) -> Dict[str, Tuple[str, List[Tuple[str, str]]]]:
     i = 0
-    parsed: Dict[str, List[Tuple[str, str]]] = {}
+    parsed: Dict[str, Tuple[str, List[Tuple[str, str]]]] = {}
     while i < len(requirements):
         req = requirements[i].strip()
         if req == "-r":
@@ -31,11 +31,11 @@ def iter_requirements(
                 subparsed = iter_requirements(
                     re.split(r"\s*[\n\r]+\s*", file.read().strip())
                 )
-                for key, constraints in subparsed.items():
+                for key, line_constraints in subparsed.items():
                     try:
-                        parsed[key].extend(constraints)
+                        parsed[key][1].extend(line_constraints[1])
                     except KeyError:
-                        parsed[key] = constraints
+                        parsed[key] = line_constraints
             i += 1
         else:
             try:
@@ -43,9 +43,9 @@ def iter_requirements(
                     iter(parse_requirements([req]).items())
                 )
                 try:
-                    parsed[key].extend(constraints)
+                    parsed[key][1].extend(constraints)
                 except KeyError:
-                    parsed[key] = constraints
+                    parsed[key] = (req, constraints)
             except StopIteration:
                 pass  # No fallback, skip silenty
         i += 1
@@ -64,9 +64,9 @@ def app() -> None:
     requirements = sys.argv[1:]
     if requirements:
         engine = Engine(rules=get_rules())
-        for req, values in iter_requirements(requirements).items():
+        for req, (line, values) in iter_requirements(requirements).items():
             if not PIPED:
-                print(f"{Fore.YELLOW}{req}{Fore.RESET}", end="", flush=True)
+                print(f"{Fore.YELLOW}{line}{Fore.RESET}", end="", flush=True)
             for version in engine.expend((req, values)):
                 try:
                     path = next(
@@ -86,7 +86,7 @@ def app() -> None:
                     ):
                         pretty_path = pretty_path.replace(src, dst)
                     print(
-                        f"\r{Fore.RED}{req}{Fore.RESET}  "
+                        f"\r{Fore.RED}{line}{Fore.RESET}  "
                         f"{Fore.LIGHTBLACK_EX}# {pretty_path}{Fore.RESET}"
                     )
                     error = 1
@@ -94,5 +94,5 @@ def app() -> None:
                 except StopIteration:
                     pass
             else:
-                print(f"\r{Fore.GREEN}{req}{Fore.RESET}")
+                print(f"\r{Fore.GREEN}{line}{Fore.RESET}")
     sys.exit(error)

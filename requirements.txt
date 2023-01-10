@@ -1,7 +1,7 @@
-tqdm
-lxml
-requests
-orjson
-google-cloud-bigquery
-packaging
-typing_extensions
+tqdm>=4.64.1
+lxml>=4.9.2
+requests>=2.27.1
+orjson>=3.6.1
+google-cloud-bigquery>=3.2.0
+packaging>=21.3
+typing_extensions>=4.1.1
