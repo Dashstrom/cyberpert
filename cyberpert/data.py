@@ -131,6 +131,7 @@ def fetch_cves_per_packages() -> List[List[Union[Condition, Facts]]]:
 
 
 def tuplize(array: Any) -> Tuple[Any, ...]:
+    """Turn N dimension list to N dimension tuple."""
     if isinstance(array, list):
         return tuple(tuplize(obj) for obj in array)
     return array  # type: ignore

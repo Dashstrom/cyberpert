@@ -4,32 +4,37 @@ from typing import Any, Dict, List, Tuple
 
 from colorama import Fore, init
 
+from .data import get_rules
+from .engine import InferenceEngine
 from .pypi import parse_requirements
 from .utils import PIPED
-
-from .data import get_rules
-from .engine import Engine
 
 init()
 
 
-def iter_requirements(
+RE_SPLIT = re.compile(r"\s*[\n\r]+\s*")
+
+
+def recursive_requirements_parsing(
     requirements: List[str],
 ) -> Dict[str, Tuple[str, List[Tuple[str, str]]]]:
+    """Parse requirements and requirements inside files."""
     i = 0
     parsed: Dict[str, Tuple[str, List[Tuple[str, str]]]] = {}
     while i < len(requirements):
         req = requirements[i].strip()
-        if req == "-r":
+        if not req:
+            continue
+        elif req == "-r":
             path = requirements[i + 1]
-        elif req.strip().startswith("-r "):
+        elif req.startswith("-r "):
             path = req.split("-r")[1].strip()
         else:
             path = None
         if path:
             with open(path, "r", encoding="utf8") as file:
-                subparsed = iter_requirements(
-                    re.split(r"\s*[\n\r]+\s*", file.read().strip())
+                subparsed = recursive_requirements_parsing(
+                    RE_SPLIT.split(file.read().strip())
                 )
                 for key, line_constraints in subparsed.items():
                     try:
@@ -53,6 +58,7 @@ def iter_requirements(
 
 
 def recursive_join(obj: Any) -> str:
+    """Make pretty condition."""
     if isinstance(obj, (tuple, list)):
         return " ".join(recursive_join(element) for element in obj)
     else:
@@ -60,17 +66,26 @@ def recursive_join(obj: Any) -> str:
 
 
 def app() -> None:
+    """Main function for calling cli."""
     error = 0
     requirements = sys.argv[1:]
+    if not requirements:
+        requirements = list(sys.stdin)
     if requirements:
-        engine = Engine(rules=get_rules())
-        for req, (line, constraint) in iter_requirements(requirements).items():
+        engine = InferenceEngine(rules=get_rules())
+        for req, (line, constraint) in recursive_requirements_parsing(
+            requirements
+        ).items():
             if not PIPED:
                 print(f"{Fore.YELLOW}{line}{Fore.RESET}", end="", flush=True)
-            for version in engine.expend((req, constraint)):
+            for version in engine.broadcaster((req, constraint)):
                 try:
                     path = next(
-                        iter(engine.explore({req: version}, {"$vuln": True}))
+                        iter(
+                            engine.forward_chaining(
+                                {req: version}, {"$vuln": True}
+                            )
+                        )
                     )
                     pretty_path = " → ".join(
                         recursive_join(part) for part in path[:-1]
@@ -95,4 +110,6 @@ def app() -> None:
                     pass
             else:
                 print(f"\r{Fore.GREEN}{line}{Fore.RESET}")
+    else:
+        error = 2
     sys.exit(error)

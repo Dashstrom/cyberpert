@@ -9,7 +9,7 @@ def read(path):
 
 setup(
     name="cyberpert",
-    version="1.0.0.dev20221229",
+    version="1.0.0.dev20230111",
     author="Dashstrom",
     author_email="dashstrom.pro@gmail.com",
     url="https://github.com/Dashstrom/cyberpert",

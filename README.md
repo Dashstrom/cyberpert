@@ -6,7 +6,14 @@
 git clone https://github.com/Dashstrom/cyberpert.git
 cd cyberpert
 pip3 install .
+```
+
+## Usage
+
+```sh
 cyberpert -r requirements-dev.txt
+cyberpert numpy==1.23.0
+pip3 freeze | cyberpert
 ```
 
 ## Developement
@@ -16,8 +23,8 @@ For setup developpement :
 ```sh
 git clone https://github.com/Dashstrom/cyberpert.git
 cd cyberpert
-pip3 install -r requirements-dev.txt -r requirements.txt
-python3 -m cyberpert
+pip3 install -r requirements-dev.txt
+pip3 install -e . 
 ```
 
 For push new features, please process as below :
@@ -26,6 +33,7 @@ For push new features, please process as below :
 black .
 isort .
 tox
+git add .
 git commit -m "Your amazing feature"
 git push
 ```
